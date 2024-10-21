@@ -148,7 +148,6 @@ async def create_research_plan(
     return {
         "steps": response["steps"],
         "documents": "delete",
-        "query": state.messages[-1].content,
     }
 
 
@@ -213,7 +212,7 @@ async def respond(
     prompt = configuration.response_system_prompt.format(context=context)
     messages = [{"role": "system", "content": prompt}] + state.messages
     response = await model.ainvoke(messages)
-    return {"messages": [response], "answer": response.content}
+    return {"messages": [response], "answer": response.content, "query": state.messages[0].content,}
 
 
 # Define the graph
