@@ -7,7 +7,7 @@ from parser import langchain_docs_extractor
 import weaviate
 from bs4 import BeautifulSoup, SoupStrainer
 from constants import WEAVIATE_DOCS_INDEX_NAME
-from langchain.document_loaders import RecursiveUrlLoader, SitemapLoader
+from langchain.document_loaders import RecursiveUrlLoader, SitemapLoader, PyPDFLoader
 from langchain.indexes import SQLRecordManager, index
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.utils.html import PREFIXES_TO_IGNORE_REGEX, SUFFIXES_TO_IGNORE_REGEX
@@ -67,6 +67,30 @@ def load_langsmith_docs():
         check_response_status=True,
     ).load()
 
+def load_pdf_docs(project_name, file_name):
+    # file_path = "assets/05.Canada Water/CWA10-FMD-XXX-XX-SP-SP-000001.pdf"
+    folder_path = "assets/" + project_name + "/"
+    # file_name = ["ZD-FAC-A180-Sp-XX-001 P1 - UCW Acoustic Performance Specification (D1 & D2).pdf", "ZD-WSP-G251-SP-XX-001.pdf"]
+    file_path = folder_path + file_name
+
+    if os.path.isdir(folder_path):
+        print("Folder exists.")
+    else:
+        print("Folder does not exist.")
+
+    loader = PyPDFLoader(file_path)
+    pages = loader.load()
+    for page in pages:
+        page.metadata["source"] = "file:///Users/gintaras/Documents/imum/rag/chat-langchain-main/" + file_path
+        page.metadata["title"] = file_path
+    # pages = []
+    # async for page in loader.alazy_load():
+    #     pages.append(page)
+
+    print(f"{pages[0].metadata}\n")
+    print(pages[0].page_content)
+    return pages
+
 
 def simple_extractor(html: str) -> str:
     soup = BeautifulSoup(html, "lxml")
@@ -120,17 +144,17 @@ def ingest_docs():
     )
     record_manager.create_schema()
 
-    docs_from_documentation = load_langchain_docs()
-    logger.info(f"Loaded {len(docs_from_documentation)} docs from documentation")
-    docs_from_api = load_api_docs()
-    logger.info(f"Loaded {len(docs_from_api)} docs from API")
-    docs_from_langsmith = load_langsmith_docs()
-    logger.info(f"Loaded {len(docs_from_langsmith)} docs from Langsmith")
+    doc1 = load_pdf_docs("04.Trinity Island", "ZD-WSP-G251-SP-XX-001.pdf")
+    doc2 = load_pdf_docs(
+        "04.Trinity Island", "ZD-FAC-A180-Sp-XX-001 P1 - UCW Acoustic Performance Specification (D1 & D2).pdf")
+    docs = doc1 + doc2
+    logger.info(
+        f"Loaded {len(docs)} docs from pdfs")
 
-    docs_transformed = text_splitter.split_documents(
-        docs_from_documentation + docs_from_api + docs_from_langsmith
-    )
-    docs_transformed = [doc for doc in docs_transformed if len(doc.page_content) > 10]
+    docs_transformed = text_splitter.split_documents(docs)
+    docs_transformed = [
+        doc for doc in docs_transformed if len(doc.page_content) > 10
+    ]
 
     # We try to return 'source' and 'title' metadata when querying vector store and
     # Weaviate will error at query time if one of the attributes is missing from a
