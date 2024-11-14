@@ -67,6 +67,7 @@ def load_langsmith_docs():
         check_response_status=True,
     ).load()
 
+
 def load_pdf_docs(project_name, file_name):
     # file_path = "assets/05.Canada Water/CWA10-FMD-XXX-XX-SP-SP-000001.pdf"
     folder_path = "assets/" + project_name + "/"
@@ -81,8 +82,8 @@ def load_pdf_docs(project_name, file_name):
     loader = PyPDFLoader(file_path)
     pages = loader.load()
     for page in pages:
-        page.metadata["source"] = "file:///Users/gintaras/Documents/imum/rag/chat-langchain-main/" + file_path
-        page.metadata["title"] = file_path
+        page.metadata["source"] = "/" + file_path
+        page.metadata["title"] = project_name + " " + file_name
     # pages = []
     # async for page in loader.alazy_load():
     #     pages.append(page)
@@ -123,7 +124,8 @@ def ingest_docs():
     WEAVIATE_API_KEY = os.environ["WEAVIATE_API_KEY"]
     RECORD_MANAGER_DB_URL = os.environ["RECORD_MANAGER_DB_URL"]
 
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=200)
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=4000, chunk_overlap=200)
     embedding = get_embeddings_model()
 
     client = weaviate.Client(
@@ -144,10 +146,16 @@ def ingest_docs():
     )
     record_manager.create_schema()
 
-    doc1 = load_pdf_docs("04.Trinity Island", "ZD-WSP-G251-SP-XX-001.pdf")
-    doc2 = load_pdf_docs(
-        "04.Trinity Island", "ZD-FAC-A180-Sp-XX-001 P1 - UCW Acoustic Performance Specification (D1 & D2).pdf")
-    docs = doc1 + doc2
+    docs = []
+    if WEAVIATE_DOCS_INDEX_NAME == "Trinity_Island":
+        doc1 = load_pdf_docs("04.Trinity Island", "ZD-WSP-G251-SP-XX-001.pdf")
+        doc2 = load_pdf_docs(
+            "04.Trinity Island", "ZD-FAC-A180-Sp-XX-001 P1 - UCW Acoustic Performance Specification (D1 & D2).pdf")
+        docs = doc1 + doc2
+    elif WEAVIATE_DOCS_INDEX_NAME == "Canada_Water":
+        docs = load_pdf_docs(
+            "05.Canada Water", "CWA10-FMD-XXX-XX-SP-SP-000001.pdf")
+
     logger.info(
         f"Loaded {len(docs)} docs from pdfs")
 
@@ -171,11 +179,13 @@ def ingest_docs():
         vectorstore,
         cleanup="full",
         source_id_key="source",
-        force_update=(os.environ.get("FORCE_UPDATE") or "false").lower() == "true",
+        force_update=(os.environ.get("FORCE_UPDATE")
+                      or "false").lower() == "true",
     )
 
     logger.info(f"Indexing stats: {indexing_stats}")
-    num_vecs = client.query.aggregate(WEAVIATE_DOCS_INDEX_NAME).with_meta_count().do()
+    num_vecs = client.query.aggregate(
+        WEAVIATE_DOCS_INDEX_NAME).with_meta_count().do()
     logger.info(
         f"LangChain now has this many vectors: {num_vecs}",
     )

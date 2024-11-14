@@ -1,3 +1,4 @@
+import React from "react";
 import "react-toastify/dist/ReactToastify.css";
 import { Card, CardBody, Heading } from "@chakra-ui/react";
 import { sendFeedback } from "../utils/sendFeedback";
@@ -5,6 +6,7 @@ import { sendFeedback } from "../utils/sendFeedback";
 export type Source = {
   url: string;
   title: string;
+  page: number;
 };
 
 export function SourceBubble({
@@ -20,15 +22,19 @@ export function SourceBubble({
   onMouseLeave: () => any;
   runId?: string;
 }) {
+  //   const pdfPath = "/assets/04.Trinity%20Island/ZD-WSP-G251-SP-XX-001.pdf";
+  const pdfPath = "/assets/05.Canada Water/CWA10-FMD-XXX-XX-SP-SP-000001.pdf";
+  const pdfUrlWithPage = `${pdfPath}#page=${source.page}`;
+
   return (
     <Card
       onClick={async () => {
-        window.open(source.url, "_blank");
+        window.open(pdfUrlWithPage, "_blank");
         if (runId) {
           await sendFeedback({
             key: "user_click",
             runId,
-            value: source.url,
+            value: pdfPath,
             isExplicit: false,
           });
         }
@@ -45,6 +51,9 @@ export function SourceBubble({
         <Heading size={"sm"} fontWeight={"normal"} color={"white"}>
           {source.title}
         </Heading>
+        {/* <Document file={pdfPath}>
+          <Page pageNumber={source.page} />
+        </Document> */}
       </CardBody>
     </Card>
   );
