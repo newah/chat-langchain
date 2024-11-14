@@ -30,7 +30,7 @@ jobs:
               uses: docker/build-push-action@v2
               with:
                   context: ./
-                  file: ./dockerfile
+                  file: ./Dockerfile
                   push: true
                   tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:dev
                   # cache-from: type=registry,ref=user/app:latest
