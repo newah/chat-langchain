@@ -226,11 +226,11 @@ export function ChatWindow(props: { conversationId: string }) {
           mb={1}
           color={"white"}
         >
-          Chat LangChain 🦜🔗
+          Chat with your project documents
         </Heading>
         {messages.length > 0 ? (
           <Heading fontSize="md" fontWeight={"normal"} mb={1} color={"white"}>
-            We appreciate feedback!
+            Try 3.5 Sonnet and GPT4o-mini - see how they compare
           </Heading>
         ) : (
           <Heading
@@ -240,10 +240,10 @@ export function ChatWindow(props: { conversationId: string }) {
             marginTop={"10px"}
             textAlign={"center"}
           >
-            Ask me anything about LangChain&apos;s{" "}
-            <Link href="https://python.langchain.com/" color={"blue.200"}>
+            Ask me anything about the project
+            {/* <Link href="https://python.langchain.com/" color={"blue.200"}>
               Python documentation!
-            </Link>
+            </Link> */}
           </Heading>
         )}
         <div className="text-white flex flex-wrap items-center mt-4">
@@ -299,7 +299,7 @@ export function ChatWindow(props: { conversationId: string }) {
           value={input}
           maxRows={5}
           marginRight={"56px"}
-          placeholder="What does RunnablePassthrough.assign() do?"
+          placeholder="Snow load kN/m2?"
           textColor={"white"}
           borderColor={"rgb(58, 58, 61)"}
           onChange={(e) => setInput(e.target.value)}

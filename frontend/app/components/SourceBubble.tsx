@@ -24,7 +24,7 @@ export function SourceBubble({
 }) {
   //   const pdfPath = "/assets/04.Trinity%20Island/ZD-WSP-G251-SP-XX-001.pdf";
   const pdfPath = "/assets/05.Canada Water/CWA10-FMD-XXX-XX-SP-SP-000001.pdf";
-  const pdfUrlWithPage = `${pdfPath}#page=${source.page}`;
+  const pdfUrlWithPage = `${pdfPath}#page=${source.page + 1}`;
 
   return (
     <Card

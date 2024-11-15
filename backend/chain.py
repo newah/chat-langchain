@@ -36,8 +36,8 @@ from langchain_openai import ChatOpenAI
 from langsmith import Client
 
 RESPONSE_TEMPLATE = """\
-You are an expert programmer and problem-solver, tasked with answering any question \
-about Langchain.
+You are an expert facade engineer and problem-solver, tasked with answering any question \
+about facade engineering.
 
 Generate a comprehensive and informative answer of 80 words or less for the \
 given question based solely on the provided search results (URL and content). You must \
