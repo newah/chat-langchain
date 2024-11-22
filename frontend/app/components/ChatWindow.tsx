@@ -213,6 +213,8 @@ export function ChatWindow(props: { conversationId: string }) {
     }
   };
 
+  const project = process.env.NEXT_PUBLIC_PROJECT_NAME;
+
   return (
     <div className="flex flex-col items-center p-8 rounded grow max-h-full">
       <Flex
@@ -226,7 +228,7 @@ export function ChatWindow(props: { conversationId: string }) {
           mb={1}
           color={"white"}
         >
-          Chat with your project documents
+          Chat with your project documents <p>{project}</p>
         </Heading>
         {messages.length > 0 ? (
           <Heading fontSize="md" fontWeight={"normal"} mb={1} color={"white"}>
